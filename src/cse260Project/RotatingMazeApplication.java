@@ -21,6 +21,7 @@ public class RotatingMazeApplication extends Application{
 		
 		homeScreen.playBtn.setOnAction(e -> window.setScene(gameScreen));
 		homeScreen.difficultyBtn.setOnAction(e -> window.setScene(difficultyScreen));
+		homeScreen.quitBtn.setOnAction(e -> window.close());
 		
 		difficultyScreen.returnToHomeScreenBtn.setOnAction(e -> window.setScene(homeScreen));
 		

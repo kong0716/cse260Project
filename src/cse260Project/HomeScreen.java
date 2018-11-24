@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 public class HomeScreen extends Scene{
 	protected Button playBtn;
 	protected Button difficultyBtn;
+	protected Button quitBtn;
 	protected static BorderPane pane = new BorderPane();
 	public HomeScreen() {
 		super(pane, 1000, 1000);
@@ -20,8 +21,9 @@ public class HomeScreen extends Scene{
 		
 		playBtn = new Button("Play");
 		difficultyBtn = new Button("Difficulty Settings");
+		quitBtn = new Button("Quit Game");
 		VBox vBox = new VBox(10);
-		vBox.getChildren().addAll(playBtn, difficultyBtn);
+		vBox.getChildren().addAll(playBtn, difficultyBtn, quitBtn);
 		pane.setTop(welcomeLabel);
 		pane.setCenter(vBox);
 		super.setRoot(pane);
