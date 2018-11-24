@@ -1,6 +1,7 @@
 package cse260Project;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -9,10 +10,9 @@ import java.util.Stack;
 
 public class MazeGen {
 	public static void main(String []args) {
-		Random randomNumber = new Random();
 		Scanner in = new Scanner(System.in);
-		int row = 50;
-		int col = 50;
+		int row = 10;
+		int col = 10;
 		//Creates the initial maze
 		Cell [][] maze= new Cell[row][col];
 		for(int i = 0; i < row; i++) {
@@ -26,6 +26,7 @@ public class MazeGen {
 		boolean openedPath = false;
 		while(!frontier.isEmpty()) {
 			//Use a flag to find if you need to cut a path
+			Random randomNumber = new Random();
 			int random = randomNumber.nextInt(frontier.size());
 			
 			if(frontier.get(random) == null) {//Avoids null Cells
@@ -38,6 +39,7 @@ public class MazeGen {
 				break;
 			}
 			Cell temp = frontier.remove(random);
+			//Maze is vertical heavy because of the way we implemented the if statements
 			if(!frontier.contains(returnTopAdjacent(maze, temp))) {
 				if(!path.contains(returnTopAdjacent(maze, temp))) {
 					frontier.add(returnTopAdjacent(maze, temp));
@@ -85,7 +87,9 @@ public class MazeGen {
 		System.out.println("Maze");
 		System.out.print(" ");
 		for(int i = 0; i < maze.length; i++) {
-			System.out.print("_ ");
+			if(!maze[0][i].isPathUP()) {
+				System.out.print("_ ");
+			}
 		}
 		for(int i = 0; i < maze.length; i++) {
 			System.out.println("");
@@ -109,8 +113,8 @@ public class MazeGen {
 		}
 	}
 	public static Cell pickEntrance(Cell[][] maze) {
-		maze[0][0].isStartCELL();
-		return maze[10][10];
+		maze[0][0].setStartCELL(true);
+		return maze[0][0];
 	}
 	public static Cell returnTopAdjacent(Cell[][] maze, Cell cell) {
 		if(cell.getRow() > 0) {

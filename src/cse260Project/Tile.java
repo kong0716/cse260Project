@@ -1,6 +1,7 @@
 package cse260Project;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Tile {
@@ -16,7 +17,7 @@ public class Tile {
 	public List<Wall> walls;
 
 	public Tile(double centerX, double centerY, double height, double width, boolean UP, boolean DOWN, boolean LEFT, boolean RIGHT) {
-		this.walls = new ArrayList<Wall>();
+		this.walls = new LinkedList<Wall>();
 		this.centerX = centerX;
 		this.centerY = centerY;
 		this.height = height;
