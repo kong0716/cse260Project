@@ -11,8 +11,8 @@ import java.util.Stack;
 public class MazeGen {
 	public static void main(String []args) {
 		Scanner in = new Scanner(System.in);
-		int row = 10;
-		int col = 10;
+		int row = 50;
+		int col = 50;
 		//Creates the initial maze
 		Cell [][] maze= new Cell[row][col];
 		for(int i = 0; i < row; i++) {
