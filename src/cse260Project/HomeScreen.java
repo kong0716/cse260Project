@@ -18,15 +18,19 @@ public class HomeScreen extends Scene{
 		welcomeLabel.setScaleY(2);
 		welcomeLabel.setMinHeight(100);
 		
+		initializeBtns();
 		
-		playBtn = new Button("Play");
-		difficultyBtn = new Button("Difficulty Settings");
-		quitBtn = new Button("Quit Game");
 		VBox vBox = new VBox(10);
 		vBox.getChildren().addAll(playBtn, difficultyBtn, quitBtn);
 		pane.setTop(welcomeLabel);
 		pane.setCenter(vBox);
 		super.setRoot(pane);
+	}
+	
+	public void initializeBtns() {
+		playBtn = new Button("Play");
+		difficultyBtn = new Button("Difficulty Settings");
+		quitBtn = new Button("Quit Game");
 	}
 
 }

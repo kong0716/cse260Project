@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
@@ -23,8 +24,19 @@ public class GameScreen extends Scene {
 	private static double sizeYScreen = 1000;
 	private double startPosXMaze;
 	private double startPosYMaze;
+	private int mazeSize;
+	private int rotationSpeed;
+	protected Cell[][] maze;
 	protected static BorderPane root = new BorderPane();
 	protected static BorderPane imagePane = new BorderPane();
+	protected Button returnToHomeScreenBtn;
+	protected Button rotateBtn;
+	protected Button nextLvlBtn;
+	private int tileSize;
+	private ImageView mazeImage;
+	private RotateTransition rotate;
+	private HBox hBoxTop;
+	private HBox hBoxBtm;
 
 	public GameScreen() {
 		super(root, sizeXScreen, sizeYScreen);
@@ -32,8 +44,13 @@ public class GameScreen extends Scene {
 		this.startPosYMaze = 0;
 		// Tile tile = new Tile(500, 500, 100, 100, true, true, true, true);
 		// root.getChildren().addAll(tile.walls);
-		Cell[][] maze = generateMaze(10, 10);
-		double tileSize = maze.length * 2;
+		setDefaultDifficulty();
+		
+		initializeBtns();
+		
+		maze = generateMaze(mazeSize, mazeSize);
+		tileSize = maze.length * 2;
+		
 		for (int row = 0; row < maze.length; row++) {
 			for (int col = 0; col < maze[row].length; col++) {
 				Tile tile = new Tile(startPosXMaze, startPosYMaze, sizeXScreen / tileSize, sizeYScreen / tileSize,
@@ -45,17 +62,10 @@ public class GameScreen extends Scene {
 			this.startPosXMaze = 0;
 			startPosYMaze += sizeYScreen / tileSize;
 		}
-		ImageView mazeImage = genMazeImage(imagePane);
-		imagePane.getChildren().clear();
-		imagePane.getChildren().add(mazeImage);
-		
-		RotateTransition rotate = new RotateTransition(Duration.seconds(10), mazeImage);
-		rotate.setFromAngle(0);
-		rotate.setToAngle(359);
-		rotate.setAutoReverse(true);
-		rotate.setCycleCount(Animation.INDEFINITE);
-		rotate.play();
-		Button rotateBtn = new Button("Rotate");
+		mazeImage = genMazeImage(imagePane);
+		//imagePane.getChildren().clear();
+		//imagePane.getChildren().add(mazeImage);
+		rotate = rotateNode(mazeImage);
 		rotateBtn.setOnAction(e -> {
 			if (rotate.getStatus() == Animation.Status.RUNNING) {
 				rotate.pause();
@@ -64,14 +74,72 @@ public class GameScreen extends Scene {
 			}
 		});
 		
+		hBoxTop = new HBox(20);
+		hBoxTop.getChildren().addAll(nextLvlBtn);
+		
+		hBoxBtm = new HBox(20);
+		hBoxBtm.getChildren().addAll(returnToHomeScreenBtn, rotateBtn);
+		
+		root.setTop(hBoxTop);
 		root.setCenter(mazeImage);
-		//root.setBottom(rotateBtn);
+		root.setBottom(hBoxBtm);
+		
+		nextLvlBtn.setOnAction(e -> {
+			root.getChildren().remove(mazeImage);
+			imagePane.getChildren().clear();
+			this.startPosXMaze = 0;
+			this.startPosYMaze = 0;
+			// Tile tile = new Tile(500, 500, 100, 100, true, true, true, true);
+			// root.getChildren().addAll(tile.walls);
+			setDefaultDifficulty();
+			
+			initializeBtns();
+			
+			maze = generateMaze(mazeSize, mazeSize);
+			mazeImage = genMazeImage(initMazeGraphics(maze));
+			rotate = rotateNode(mazeImage);
+			
+			root.setCenter(mazeImage);
+		});
 	}
 
+	public void setDefaultDifficulty() {
+		this.rotationSpeed = 5;
+		this.mazeSize = 5;
+	}
+	public RotateTransition rotateNode(javafx.scene.Node node) {
+		RotateTransition rotate = new RotateTransition(Duration.seconds(rotationSpeed), node);
+		rotate.setFromAngle(0);
+		rotate.setToAngle(360);
+		//rotate.setAutoReverse(true);
+		rotate.setCycleCount(Animation.INDEFINITE);
+		return rotate;
+	}
+	public BorderPane initMazeGraphics(Cell[][] maze) {
+		tileSize = maze.length * 2;
+		for (int row = 0; row < maze.length; row++) {
+			for (int col = 0; col < maze[row].length; col++) {
+				Tile tile = new Tile(startPosXMaze, startPosYMaze, sizeXScreen / tileSize, sizeYScreen / tileSize,
+						!maze[row][col].isPathUP(), !maze[row][col].isPathDOWN(), !maze[row][col].isPathLEFT(),
+						!maze[row][col].isPathRIGHT());
+				imagePane.getChildren().addAll(tile.walls);
+				startPosXMaze += sizeXScreen / tileSize;
+			}
+			this.startPosXMaze = 0;
+			startPosYMaze += sizeYScreen / tileSize;
+		}
+		return imagePane;
+	}
 	public ImageView genMazeImage(Pane pane) {
 		WritableImage snapshot = pane.snapshot(new SnapshotParameters(), null);
 		ImageView mazeImage = new ImageView(snapshot);
 		return mazeImage;
+	}
+	
+	public void initializeBtns() {
+		returnToHomeScreenBtn = new Button("Home Screen");
+		rotateBtn = new Button("Rotate");
+		nextLvlBtn = new Button("Next Level");
 	}
 
 	public Cell[][] generateMaze(int row, int col) {
@@ -177,10 +245,15 @@ public class GameScreen extends Scene {
 	}
 
 	public static Cell pickEntrance(Cell[][] maze) {
-		maze[0][0].setStartCELL(true);
+		maze[maze.length-1][maze.length-1].setStartCELL(true);
+		maze[maze.length-1][maze.length-1].setPathDOWN(true);
+		return maze[maze.length-1][maze.length-1];
+	}
+	public static Cell pickExit(Cell[][] maze) {
+		maze[0][0].setEndCELL(true);
+		maze[0][0].setPathUP(true);
 		return maze[0][0];
 	}
-
 	public static Cell returnTopAdjacent(Cell[][] maze, Cell cell) {
 		if (cell.getRow() > 0) {
 			return maze[cell.getRow() - 1][cell.getCol()];

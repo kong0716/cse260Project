@@ -16,14 +16,16 @@ public class RotatingMazeApplication extends Application{
 		window.setTitle("Rotating Maze Application");
 		
 		homeScreen = new HomeScreen();
-		gameScreen = new GameScreen();
 		difficultyScreen = new DifficultyScreen();
+		gameScreen = new GameScreen();
 		
 		homeScreen.playBtn.setOnAction(e -> window.setScene(gameScreen));
 		homeScreen.difficultyBtn.setOnAction(e -> window.setScene(difficultyScreen));
 		homeScreen.quitBtn.setOnAction(e -> window.close());
 		
 		difficultyScreen.returnToHomeScreenBtn.setOnAction(e -> window.setScene(homeScreen));
+		
+		gameScreen.returnToHomeScreenBtn.setOnAction(e -> window.setScene(homeScreen));
 		
 		window.setScene(homeScreen);
 		window.show();

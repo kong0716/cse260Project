@@ -21,6 +21,15 @@ public class DifficultyScreen extends Scene{
 		difficultyLabel.setScaleY(2);
 		difficultyLabel.setMinHeight(100);
 		
+		initializeBtns();
+		
+		VBox vBox = new VBox(10);
+		vBox.getChildren().addAll(beginnerBtn, intermediateBtn, brainFuckBtn, returnToHomeScreenBtn);
+		pane.setTop(difficultyLabel);
+		pane.setCenter(vBox);
+		super.setRoot(pane);
+	}
+	public void initializeBtns() {
 		returnToHomeScreenBtn = new Button("Home Screen");
 		beginnerBtn = new RadioButton("Beginner");
 		intermediateBtn = new RadioButton("Intermediate");
@@ -29,12 +38,6 @@ public class DifficultyScreen extends Scene{
 		beginnerBtn.setToggleGroup(group);
 		intermediateBtn.setToggleGroup(group);
 		brainFuckBtn.setToggleGroup(group);
-		
-		VBox vBox = new VBox(10);
-		vBox.getChildren().addAll(beginnerBtn, intermediateBtn, brainFuckBtn, returnToHomeScreenBtn);
-		pane.setTop(difficultyLabel);
-		pane.setCenter(vBox);
-		super.setRoot(pane);
 	}
 
 }
