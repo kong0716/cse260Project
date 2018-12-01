@@ -3,9 +3,12 @@ package cse260Project;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Robot;
+import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
@@ -18,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -77,7 +81,6 @@ public class GameScreen extends Scene {
 			}
 			this.mazeImage.setOnMouseMoved(event -> {
 				try {
-
 					// AWT Robot and Color to trace pixel information
 					Robot robot = new java.awt.Robot();
 					Color color = robot.getPixelColor((int) event.getScreenX(), (int) event.getScreenY());
