@@ -2,6 +2,7 @@ package cse260Project;
 
 import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Robot;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -21,7 +22,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.robot.Robot;
 import javafx.util.Duration;
 
 public class GameScreen extends Scene {
@@ -43,6 +43,7 @@ public class GameScreen extends Scene {
 	private RotateTransition rotate;
 	private HBox hBoxTop;
 	private HBox hBoxBtm;
+	private Robot mouse;
 
 	public GameScreen() {
 		super(root, sizeXScreen, sizeYScreen);
@@ -53,50 +54,53 @@ public class GameScreen extends Scene {
 		maze = generateMaze(mazeSize, mazeSize);
 		mazeImage = genMazeImage(initMazeGraphics(maze));
 		rotate = rotateNode(mazeImage);
-		
+
 		try {
+
 			mouse = new Robot();
+
 		} catch (AWTException e1) {
+
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+
 		}
-		
-		
-		
+
 		rotateBtn.setOnMouseClicked(e -> {
 			if (rotate.getStatus() == Animation.Status.RUNNING) {
 				rotate.pause();
 			} else {
-				mouse.mouseMove(1920/2, 1080/2);
-				mouse.mouseMove(1920/2, 1080/2);
-				mouse.mouseMove(1920/2, 1080/2);
+				mouse.mouseMove(1920 / 2, 1080 / 2);
+				mouse.mouseMove(1920 / 2, 1080 / 2);
+				mouse.mouseMove(1920 / 2, 1080 / 2);
 				rotate.play();
 			}
-			while(mazeImage.isHover()) {
+			this.mazeImage.setOnMouseMoved(event -> {
 				try {
 
-	            // AWT Robot and Color to trace pixel information
-	            Robot robot = new Robot();
-	            Color color = robot.getPixelColor((int) mouse.get, (int) event.getScreenY());
+					// AWT Robot and Color to trace pixel information
+					Robot robot = new java.awt.Robot();
+					Color color = robot.getPixelColor((int) event.getScreenX(), (int) event.getScreenY());
 
-	            // Initializing pixel info
-	            String xPos = Integer.toString((int) event.getX());
-	            String yPos = Integer.toString((int) event.getY());
-	            String colorRed = Integer.toString(color.getRed());
-	            String colorBlue = Integer.toString(color.getBlue());
-	            String colorGreen = Integer.toString(color.getGreen());
-	            String hexColor = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+					// Initializing pixel info
+					String xPos = Integer.toString((int) event.getX());
+					String yPos = Integer.toString((int) event.getY());
+					String colorRed = Integer.toString((int) color.getRed());
+					String colorBlue = Integer.toString((int) color.getBlue());
+					String colorGreen = Integer.toString((int) color.getGreen());
+					String hexColor = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
 
-	            // Unify and format the information
-	            String pixelInfo = "X: " + xPos + " Y: " + yPos + " | "
-	                    + "r: " + colorRed + " g: " + colorGreen +
-	                    " b: " + colorBlue + " | " + hexColor;
-	            System.out.println(pixelInfo);
+					// Unify and format the information
+					String pixelInfo = "X: " + xPos + " Y: " + yPos + " | " + "r: " + colorRed + " g: " + colorGreen
+							+ " b: " + colorBlue + " | " + hexColor;
+					System.out.println(pixelInfo);
 
-	            // Pass it on to the MainApp
-	            //this.mainApp.getPixelInfo().setInfoString(pixelInfo);
+					// Pass it on to the MainApp
+					// this.mainApp.getPixelInfo().setInfoString(pixelInfo);
 
-	        } catch (Exception ignore){}});
+				} catch (Exception ignore) {
+				}
+			});
 		});
 		hBoxTop = new HBox(20);
 		hBoxTop.getChildren().addAll(nextLvlBtn);
