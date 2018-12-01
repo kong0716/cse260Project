@@ -30,5 +30,4 @@ public class RotatingMazeApplication extends Application{
 		window.setScene(homeScreen);
 		window.show();
 	}
-
 }

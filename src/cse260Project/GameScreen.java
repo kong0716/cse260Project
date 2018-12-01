@@ -3,7 +3,10 @@ package cse260Project;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Robot;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseListener;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -48,6 +51,7 @@ public class GameScreen extends Scene {
 	private HBox hBoxTop;
 	private HBox hBoxBtm;
 	private Robot mouse;
+	private MouseClickTask clicking = new MouseClickTask();
 
 	public GameScreen() {
 		super(root, sizeXScreen, sizeYScreen);
@@ -79,7 +83,8 @@ public class GameScreen extends Scene {
 				mouse.mouseMove(1920 / 2, 1080 / 2);
 				rotate.play();
 			}
-			this.mazeImage.setOnMouseMoved(event -> {
+			clicking.start();
+			this.mazeImage.setOnMousePressed(event -> {
 				try {
 					// AWT Robot and Color to trace pixel information
 					Robot robot = new java.awt.Robot();
@@ -329,5 +334,19 @@ public class GameScreen extends Scene {
 			return maze[cell.getRow()][cell.getCol() + 1];
 		}
 		return null;
+	}
+
+	class MouseClickTask extends Thread {
+		public void run() {
+			while (true) {
+				mouse.mousePress(InputEvent.BUTTON1_MASK);
+			    mouse.mouseRelease(InputEvent.BUTTON1_MASK);
+				try {
+					Thread.sleep(10);
+				} catch (InterruptedException ie) {
+				}
+			}
+
+		}
 	}
 }
