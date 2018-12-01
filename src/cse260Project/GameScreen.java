@@ -2,7 +2,6 @@ package cse260Project;
 
 import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Robot;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -22,6 +21,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.robot.Robot;
 import javafx.util.Duration;
 
 public class GameScreen extends Scene {
@@ -41,7 +41,6 @@ public class GameScreen extends Scene {
 	private ImageView mazeImage;
 	private Image image;
 	private RotateTransition rotate;
-	private Robot mouse;
 	private HBox hBoxTop;
 	private HBox hBoxBtm;
 
@@ -73,11 +72,12 @@ public class GameScreen extends Scene {
 				mouse.mouseMove(1920/2, 1080/2);
 				rotate.play();
 			}
-			this.mazeImage.setOnMousePressed(event -> { try {
+			while(mazeImage.isHover()) {
+				try {
 
 	            // AWT Robot and Color to trace pixel information
 	            Robot robot = new Robot();
-	            Color color = robot.getPixelColor((int) event.getScreenX(), (int) event.getScreenY());
+	            Color color = robot.getPixelColor((int) mouse.get, (int) event.getScreenY());
 
 	            // Initializing pixel info
 	            String xPos = Integer.toString((int) event.getX());
