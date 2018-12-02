@@ -29,6 +29,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class GameScreen extends Scene {
@@ -44,6 +46,7 @@ public class GameScreen extends Scene {
 	protected Button returnToHomeScreenBtn;
 	protected Button rotateBtn;
 	protected Button nextLvlBtn;
+	private Rectangle winArea;
 	private double tileSize;
 	private ImageView mazeImage;
 	private Image image;
@@ -51,7 +54,7 @@ public class GameScreen extends Scene {
 	private HBox hBoxTop;
 	private HBox hBoxBtm;
 	private Robot mouse;
-	private MouseClickTask clicking = new MouseClickTask();
+	private MouseClickTask clicking;
 
 	public GameScreen() {
 		super(root, sizeXScreen, sizeYScreen);
@@ -59,30 +62,29 @@ public class GameScreen extends Scene {
 		this.startPosYMaze = 0;
 		setDefaultDifficulty();
 		initializeBtns();
+		initializeAreas();
 		maze = generateMaze(mazeSize, mazeSize);
 		mazeImage = genMazeImage(initMazeGraphics(maze));
 		rotate = rotateNode(mazeImage);
 
 		try {
-
 			mouse = new Robot();
-
 		} catch (AWTException e1) {
 
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
-
 		}
-
 		rotateBtn.setOnMouseClicked(e -> {
 			if (rotate.getStatus() == Animation.Status.RUNNING) {
 				rotate.pause();
 			} else {
-				mouse.mouseMove(1920 / 2, 1080 / 2);
-				mouse.mouseMove(1920 / 2, 1080 / 2);
-				mouse.mouseMove(1920 / 2, 1080 / 2);
+				mouse.mouseMove(1920/2, 1080/2);
+				mouse.mouseMove(1920/2, 1080/2);
+				mouse.mouseMove(1920/2, 1080/2);
+				mouse.mouseMove(1920/2, 1080/2);
+				mouse.mouseMove(1920/2, 1080/2);
 				rotate.play();
 			}
+			clicking = new MouseClickTask();
 			clicking.start();
 			this.mazeImage.setOnMousePressed(event -> {
 				try {
@@ -110,8 +112,12 @@ public class GameScreen extends Scene {
 				}
 			});
 		});
+		this.mazeImage.setOnMouseExited(event -> {
+			clicking.askToDie();
+			clicking.stop();
+		});
 		hBoxTop = new HBox(20);
-		hBoxTop.getChildren().addAll(nextLvlBtn);
+		hBoxTop.getChildren().addAll(nextLvlBtn, winArea);
 
 		hBoxBtm = new HBox(20);
 		hBoxBtm.getChildren().addAll(returnToHomeScreenBtn, rotateBtn);
@@ -121,6 +127,7 @@ public class GameScreen extends Scene {
 		root.setBottom(hBoxBtm);
 
 		nextLvlBtn.setOnAction(e -> {
+			clicking.askToDie();
 			root.getChildren().remove(mazeImage);
 			imagePane.getChildren().clear();
 			this.startPosXMaze = 0;
@@ -181,6 +188,15 @@ public class GameScreen extends Scene {
 		returnToHomeScreenBtn = new Button("Home Screen");
 		rotateBtn = new Button("Rotate");
 		nextLvlBtn = new Button("Next Level");
+	}
+	
+	public void initializeAreas() {
+		winArea = new Rectangle(800, 30);
+		winArea.setFill(javafx.scene.paint.Color.GREEN);
+		winArea.setOnMouseClicked(event ->{
+			clicking.askToDie();
+		});
+		
 	}
 
 	public Cell[][] generateMaze(int row, int col) {
@@ -335,16 +351,22 @@ public class GameScreen extends Scene {
 		}
 		return null;
 	}
-
 	class MouseClickTask extends Thread {
+		private boolean die = false;
+		public void askToDie() {
+			die = true;
+		}
 		public void run() {
-			while (true) {
+			while (!die) {
 				mouse.mousePress(InputEvent.BUTTON1_MASK);
 			    mouse.mouseRelease(InputEvent.BUTTON1_MASK);
 				try {
-					Thread.sleep(10);
+					Thread.sleep(100);
 				} catch (InterruptedException ie) {
 				}
+				if(die) {
+			    	break;
+			    }
 			}
 
 		}
