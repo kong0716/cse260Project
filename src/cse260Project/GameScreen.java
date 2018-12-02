@@ -34,8 +34,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class GameScreen extends Scene {
-	private static double sizeXScreen = 1000;
-	private static double sizeYScreen = 1000;
+	private static double sizeXWindow = 1000;
+	private static double sizeYWindow = 1000;
 	private double startPosXMaze;
 	private double startPosYMaze;
 	private int mazeSize;
@@ -55,9 +55,10 @@ public class GameScreen extends Scene {
 	private HBox hBoxBtm;
 	private Robot mouse;
 	private MouseClickTask clicking;
+	private Thread thread;
 
 	public GameScreen() {
-		super(root, sizeXScreen, sizeYScreen);
+		super(root, sizeXWindow, sizeYWindow);
 		this.startPosXMaze = 0;
 		this.startPosYMaze = 0;
 		setDefaultDifficulty();
@@ -84,8 +85,13 @@ public class GameScreen extends Scene {
 				mouse.mouseMove(1920/2, 1080/2);
 				rotate.play();
 			}
+			try {
+				clicking.askToDie();
+			}catch (NullPointerException ex) {
+			}
 			clicking = new MouseClickTask();
-			clicking.start();
+			thread = new Thread(clicking);
+			thread.start();
 			this.mazeImage.setOnMousePressed(event -> {
 				try {
 					// AWT Robot and Color to trace pixel information
@@ -111,10 +117,9 @@ public class GameScreen extends Scene {
 				} catch (Exception ignore) {
 				}
 			});
-		});
-		this.mazeImage.setOnMouseExited(event -> {
-			clicking.askToDie();
-			clicking.stop();
+			this.mazeImage.setOnMouseExited(event -> {
+				clicking.askToDie();
+			});
 		});
 		hBoxTop = new HBox(20);
 		hBoxTop.getChildren().addAll(nextLvlBtn, winArea);
@@ -148,7 +153,7 @@ public class GameScreen extends Scene {
 
 	public void setDefaultDifficulty() {
 		this.rotationSpeed = 10;// Lower is better
-		this.mazeSize = 10;
+		this.mazeSize = 31;
 	}
 
 	public RotateTransition rotateNode(javafx.scene.Node node) {
@@ -165,15 +170,15 @@ public class GameScreen extends Scene {
 		for (int row = 0; row < maze.length; row++) {
 			for (int col = 0; col < maze[row].length; col++) {
 				if (!maze[row][col].isEndCELL()) {
-					Tile tile = new Tile(startPosXMaze, startPosYMaze, sizeXScreen / tileSize, sizeYScreen / tileSize,
+					Tile tile = new Tile(startPosXMaze, startPosYMaze, sizeXWindow / tileSize, sizeYWindow / tileSize,
 							!maze[row][col].isPathUP(), !maze[row][col].isPathDOWN(), !maze[row][col].isPathLEFT(),
 							!maze[row][col].isPathRIGHT());
 					imagePane.getChildren().addAll(tile.walls);
 				}
-				startPosXMaze += sizeXScreen / tileSize;
+				startPosXMaze += sizeXWindow / tileSize;
 			}
 			this.startPosXMaze = 0;
-			startPosYMaze += sizeYScreen / tileSize;
+			startPosYMaze += sizeYWindow / tileSize;
 		}
 		return imagePane;
 	}
@@ -351,7 +356,7 @@ public class GameScreen extends Scene {
 		}
 		return null;
 	}
-	class MouseClickTask extends Thread {
+	class MouseClickTask implements Runnable {
 		private boolean die = false;
 		public void askToDie() {
 			die = true;
@@ -360,8 +365,9 @@ public class GameScreen extends Scene {
 			while (!die) {
 				mouse.mousePress(InputEvent.BUTTON1_MASK);
 			    mouse.mouseRelease(InputEvent.BUTTON1_MASK);
-				try {
-					Thread.sleep(100);
+				
+			    try {
+					Thread.sleep(5);
 				} catch (InterruptedException ie) {
 				}
 				if(die) {

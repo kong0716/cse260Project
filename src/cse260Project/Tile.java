@@ -30,7 +30,7 @@ public class Tile {
 			this.UP = true;
 			centerY -= height/2;
 			centerX -= width/2 - width/20;
-			walls.add(new Wall(centerX, centerY, height/10, width, "UP"));
+			walls.add(new Wall(centerX, centerY, height/5, width, "UP"));
 			centerY = this.centerY;
 			centerX = this.centerX;
 		}
@@ -38,7 +38,7 @@ public class Tile {
 			this.DOWN = true;
 			centerY += height/2;
 			centerX -= width/2 - width/20;
-			walls.add(new Wall(centerX, centerY, height/10, width, "DOWN"));
+			walls.add(new Wall(centerX, centerY, height/5, width, "DOWN"));
 			centerY = this.centerY;
 			centerX = this.centerX;
 		}
@@ -46,7 +46,7 @@ public class Tile {
 			this.LEFT = true;
 			centerX -= width/2;
 			centerY -= height/2 - height/20;
-			walls.add(new Wall(centerX, centerY, height, width/10, "LEFT"));
+			walls.add(new Wall(centerX, centerY, height, width/5, "LEFT"));
 			centerX = this.centerX;
 			centerY = this.centerY;
 		}
@@ -54,7 +54,7 @@ public class Tile {
 			this.RIGHT = true;
 			centerX += width/2;
 			centerY -= height/2 - height/20;
-			walls.add(new Wall(centerX, centerY, height, width/10, "RIGHT"));
+			walls.add(new Wall(centerX, centerY, height, width/5, "RIGHT"));
 			centerX = this.centerX;
 			centerY = this.centerY;
 		}
