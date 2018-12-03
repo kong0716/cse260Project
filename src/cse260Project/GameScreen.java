@@ -40,6 +40,9 @@ public class GameScreen extends Scene {
 	private double startPosYMaze;
 	private int mazeSize;
 	private int rotationSpeed;
+	protected boolean isBrainFuck;
+	protected boolean isIntermediate;
+	protected boolean isBeginner = true;
 	public String hexColor = "#FFFFFF";
 	protected Cell[][] maze;
 	protected static BorderPane root = new BorderPane();
@@ -65,7 +68,7 @@ public class GameScreen extends Scene {
 		super(root, sizeXWindow, sizeYWindow);
 		this.startPosXMaze = 0;
 		this.startPosYMaze = 0;
-		setDefaultDifficulty();
+		setDifficulty();
 		initializeBtns();
 		initializeAreas();
 		maze = generateMaze(mazeSize, mazeSize);
@@ -149,21 +152,36 @@ public class GameScreen extends Scene {
 				clicking.askToDie();
 			}catch (NullPointerException ex) {
 			}
+			setDifficulty();
 			reCreateMazeImage();
 		});
 	}
-
+	public void setDifficulty() {
+		if(isBeginner) {
+			this.rotationSpeed = 10;// Lower is better
+			this.mazeSize = 5;
+		}else if(isIntermediate) {
+			this.rotationSpeed = 10;// Lower is better
+			this.mazeSize = 11;
+		}else if(isBrainFuck) {
+			this.rotationSpeed = 10;// Lower is better
+			this.mazeSize = 49;
+		}
+	}
 	public void setDefaultDifficulty() {
-		this.rotationSpeed = 10;// Lower is better
-		this.mazeSize = 5;
+		isBeginner = true;
+		isIntermediate = false;
+		isBrainFuck = false;
 	}
 	public void setIntermediateDifficulty() {
-		this.rotationSpeed = 10;// Lower is better
-		this.mazeSize = 11;
+		isBeginner = false;
+		isIntermediate = true;
+		isBrainFuck = false;
 	}
 	public void setBrainFuckDifficulty() {
-		this.rotationSpeed = 10;// Lower is better
-		this.mazeSize = 49;
+		isBeginner = false;
+		isIntermediate = false;
+		isBrainFuck = true;
 	}
 	public void reCreateMazeImage() {
 		root.getChildren().remove(mazeImage);
@@ -259,15 +277,6 @@ public class GameScreen extends Scene {
 			}
 			Cell temp = frontier.remove(random);
 			// Maze is vertical heavy because of the way we implemented the if statements
-			if (!frontier.contains(returnTopAdjacent(maze, temp))) {
-				if (!path.contains(returnTopAdjacent(maze, temp))) {
-					frontier.add(returnTopAdjacent(maze, temp));
-				} else if (!openedPath) {
-					temp.setPathUP(true);
-					returnTopAdjacent(maze, temp).setPathDOWN(true);
-					openedPath = true;
-				}
-			}
 			if (!frontier.contains(returnBotAdjacent(maze, temp))) {
 				if (!path.contains(returnBotAdjacent(maze, temp))) {
 					frontier.add(returnBotAdjacent(maze, temp));
@@ -283,6 +292,15 @@ public class GameScreen extends Scene {
 				} else if (!openedPath) {
 					temp.setPathLEFT(true);
 					returnLeftAdjacent(maze, temp).setPathRIGHT(true);
+					openedPath = true;
+				}
+			}
+			if (!frontier.contains(returnTopAdjacent(maze, temp))) {
+				if (!path.contains(returnTopAdjacent(maze, temp))) {
+					frontier.add(returnTopAdjacent(maze, temp));
+				} else if (!openedPath) {
+					temp.setPathUP(true);
+					returnTopAdjacent(maze, temp).setPathDOWN(true);
 					openedPath = true;
 				}
 			}

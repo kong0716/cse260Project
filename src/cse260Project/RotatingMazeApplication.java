@@ -29,9 +29,27 @@ public class RotatingMazeApplication extends Application {
 		gameScreen = new GameScreen();
 		endGameScreen = new EndGameScreen();
 
-		homeScreen.playBtn.setOnAction(e -> window.setScene(gameScreen));
+		homeScreen.playBtn.setOnAction(e -> {
+			try {
+				checking.askToDie();
+			} catch(NullPointerException ex) {
+			}
+			// Creates a thread that checks the game state
+			checking = new CheckingGameState();
+			checkingThread = new Thread(checking);
+			checkingThread.start();
+			gameScreen.nextLvlBtn.fire();
+			
+			window.setScene(gameScreen);
+		});
 		homeScreen.difficultyBtn.setOnAction(e -> window.setScene(difficultyScreen));
-		homeScreen.quitBtn.setOnAction(e -> window.close());
+		homeScreen.quitBtn.setOnAction(e -> {
+			try {
+				checking.askToDie();
+			} catch(NullPointerException ex) {
+			}
+			window.close();
+		});
 
 		difficultyScreen.returnToHomeScreenBtn.setOnAction(e -> window.setScene(homeScreen));
 		difficultyScreen.brainFuckBtn.setOnAction(e -> {
@@ -47,7 +65,13 @@ public class RotatingMazeApplication extends Application {
 			gameScreen.nextLvlBtn.fire();
 		});
 
-		gameScreen.returnToHomeScreenBtn.setOnAction(e -> window.setScene(homeScreen));
+		gameScreen.returnToHomeScreenBtn.setOnAction(e -> {
+			try {
+				checking.askToDie();
+			} catch(NullPointerException ex) {
+			}
+			window.setScene(homeScreen);
+		});
 
 		endGameScreen.returnToHomeScreenBtn.setOnAction(e -> {
 			gameScreen.setDefaultDifficulty();
@@ -58,11 +82,11 @@ public class RotatingMazeApplication extends Application {
 			gameScreen.setDefaultDifficulty();
 			gameScreen.nextLvlBtn.fire();
 			window.setScene(gameScreen);
+			// Creates a thread that checks the game state
+			checking = new CheckingGameState();
+			checkingThread = new Thread(checking);
+			checkingThread.start();
 		});
-		// Creates a thread that checks the game state
-		checking = new CheckingGameState();
-		checkingThread = new Thread(checking);
-		checkingThread.start();
 		/**
 		new Thread(new Runnable() {
 			private boolean die = false;
@@ -118,6 +142,7 @@ public class RotatingMazeApplication extends Application {
 						});
 						Thread.sleep(20);
 						this.askToDie();
+						gameScreen.hexColor = "#FFFFFF";
 					}
 					System.out.println("Check is running");
 				}
