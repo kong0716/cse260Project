@@ -40,12 +40,14 @@ public class GameScreen extends Scene {
 	private double startPosYMaze;
 	private int mazeSize;
 	private int rotationSpeed;
+	public String hexColor = "#FFFFFF";
 	protected Cell[][] maze;
 	protected static BorderPane root = new BorderPane();
 	protected static BorderPane imagePane = new BorderPane();
 	protected Button returnToHomeScreenBtn;
 	protected Button rotateBtn;
 	protected Button nextLvlBtn;
+	protected Button gameLostBtn;
 	private Rectangle winArea;
 	private double tileSize;
 	private ImageView mazeImage;
@@ -56,6 +58,8 @@ public class GameScreen extends Scene {
 	private Robot mouse;
 	private MouseClickTask clicking;
 	private Thread thread;
+	private Thread checkingThread;
+	private CheckingGameState checking;
 
 	public GameScreen() {
 		super(root, sizeXWindow, sizeYWindow);
@@ -71,7 +75,6 @@ public class GameScreen extends Scene {
 		try {
 			mouse = new Robot();
 		} catch (AWTException e1) {
-
 			e1.printStackTrace();
 		}
 		rotateBtn.setOnMouseClicked(e -> {
@@ -104,12 +107,16 @@ public class GameScreen extends Scene {
 					String colorRed = Integer.toString((int) color.getRed());
 					String colorBlue = Integer.toString((int) color.getBlue());
 					String colorGreen = Integer.toString((int) color.getGreen());
-					String hexColor = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+					hexColor = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
 
 					// Unify and format the information
 					String pixelInfo = "X: " + xPos + " Y: " + yPos + " | " + "r: " + colorRed + " g: " + colorGreen
 							+ " b: " + colorBlue + " | " + hexColor;
 					System.out.println(pixelInfo);
+					
+					if(!hexColor.equalsIgnoreCase("#FFFFFF")) {
+						clicking.askToDie();
+					}
 
 					// Pass it on to the MainApp
 					// this.mainApp.getPixelInfo().setInfoString(pixelInfo);
@@ -121,6 +128,12 @@ public class GameScreen extends Scene {
 				clicking.askToDie();
 			});
 		});
+		
+		//Creates a thread that checks the game state
+		//checking = new CheckingGameState();
+		//checkingThread = new Thread(checking);
+		//checkingThread.start();
+		
 		hBoxTop = new HBox(20);
 		hBoxTop.getChildren().addAll(nextLvlBtn, winArea);
 
@@ -132,28 +145,41 @@ public class GameScreen extends Scene {
 		root.setBottom(hBoxBtm);
 
 		nextLvlBtn.setOnAction(e -> {
-			clicking.askToDie();
-			root.getChildren().remove(mazeImage);
-			imagePane.getChildren().clear();
-			this.startPosXMaze = 0;
-			this.startPosYMaze = 0;
-			// Tile tile = new Tile(500, 500, 100, 100, true, true, true, true);
-			// root.getChildren().addAll(tile.walls);
-			setDefaultDifficulty();
-
-			initializeBtns();
-
-			maze = generateMaze(mazeSize, mazeSize);
-			mazeImage = genMazeImage(initMazeGraphics(maze));
-			rotate = rotateNode(mazeImage);
-
-			root.setCenter(mazeImage);
+			try {
+				clicking.askToDie();
+			}catch (NullPointerException ex) {
+			}
+			reCreateMazeImage();
 		});
 	}
 
 	public void setDefaultDifficulty() {
 		this.rotationSpeed = 10;// Lower is better
-		this.mazeSize = 31;
+		this.mazeSize = 5;
+	}
+	public void setIntermediateDifficulty() {
+		this.rotationSpeed = 10;// Lower is better
+		this.mazeSize = 11;
+	}
+	public void setBrainFuckDifficulty() {
+		this.rotationSpeed = 10;// Lower is better
+		this.mazeSize = 49;
+	}
+	public void reCreateMazeImage() {
+		root.getChildren().remove(mazeImage);
+		imagePane.getChildren().clear();
+		this.startPosXMaze = 0;
+		this.startPosYMaze = 0;
+		// Tile tile = new Tile(500, 500, 100, 100, true, true, true, true);
+		// root.getChildren().addAll(tile.walls);
+
+		//initializeBtns();
+
+		maze = generateMaze(mazeSize, mazeSize);
+		mazeImage = genMazeImage(initMazeGraphics(maze));
+		rotate = rotateNode(mazeImage);
+
+		root.setCenter(mazeImage);
 	}
 
 	public RotateTransition rotateNode(javafx.scene.Node node) {
@@ -193,6 +219,7 @@ public class GameScreen extends Scene {
 		returnToHomeScreenBtn = new Button("Home Screen");
 		rotateBtn = new Button("Rotate");
 		nextLvlBtn = new Button("Next Level");
+		gameLostBtn = new Button("Lose Game");
 	}
 	
 	public void initializeAreas() {
@@ -374,7 +401,28 @@ public class GameScreen extends Scene {
 			    	break;
 			    }
 			}
-
+		}
+	}
+	class CheckingGameState implements Runnable{
+		private boolean die = false;
+		public void askToDie() {
+			die = true;
+		}
+		public void run() {
+			while (!die) {
+				if(!hexColor.equalsIgnoreCase("#FFFFFF")) {
+					gameLostBtn.fire();
+					die = true;
+					break;
+				}
+			    try {
+					Thread.sleep(5);
+				} catch (InterruptedException ie) {
+				}
+				if(die) {
+			    	break;
+			    }
+			}
 		}
 	}
 }

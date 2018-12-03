@@ -15,7 +15,7 @@ public class DifficultyScreen extends Scene{
 	protected RadioButton brainFuckBtn;
 	protected static BorderPane pane = new BorderPane();
 	public DifficultyScreen() {
-		super(pane, 500, 1000);
+		super(pane, 1000, 1000);
 		pane = new BorderPane();
 		Label difficultyLabel = new Label("Difficulty");
 		difficultyLabel.setScaleY(2);
