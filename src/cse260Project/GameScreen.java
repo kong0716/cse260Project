@@ -153,7 +153,8 @@ public class GameScreen extends Scene {
 		root.setCenter(mazeImage);
 		root.setBottom(hBoxBtm);
 		
-		nextLvlBtn.setOnAction(e -> {
+		nextLvlBtn.setOnMouseClicked(e -> {
+			System.out.println("Next pressed");
 			recreateLvl();
 		});
 	}
@@ -206,7 +207,6 @@ public class GameScreen extends Scene {
 		// root.getChildren().addAll(tile.walls);
 
 		// initializeBtns();
-
 		maze = generateMaze(mazeSize, mazeSize);
 		mazeImage = genMazeImage(initMazeGraphics(maze));
 		rotate = rotateNode(mazeImage);
