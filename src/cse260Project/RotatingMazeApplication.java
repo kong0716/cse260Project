@@ -164,5 +164,4 @@ public class RotatingMazeApplication extends Application {
 			}
 		}
 	}
-
 }

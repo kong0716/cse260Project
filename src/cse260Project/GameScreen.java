@@ -124,7 +124,7 @@ public class GameScreen extends Scene {
 
 					if (!hexColor.equalsIgnoreCase("#FFFFFF")) {
 						clicking.askToDie();
-						hexColor = "#FFFFFF";
+						hexColor = "#FFFFFF"; //Resets the hexColor
 					}
 
 					// Pass it on to the MainApp
