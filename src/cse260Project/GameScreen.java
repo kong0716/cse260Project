@@ -15,6 +15,8 @@ import java.util.TimerTask;
 
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -31,6 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class GameScreen extends Scene {
@@ -53,16 +56,14 @@ public class GameScreen extends Scene {
 	protected Button gameLostBtn;
 	private Rectangle winArea;
 	private double tileSize;
-	private ImageView mazeImage;
-	private Image image;
+	protected ImageView mazeImage;
 	private RotateTransition rotate;
 	private HBox hBoxTop;
 	private HBox hBoxBtm;
 	private Robot mouse;
 	private MouseClickTask clicking;
 	private Thread thread;
-	private Thread checkingThread;
-	private CheckingGameState checking;
+	protected Stage window;
 
 	public GameScreen() {
 		super(root, sizeXWindow, sizeYWindow);
@@ -83,23 +84,27 @@ public class GameScreen extends Scene {
 		rotateBtn.setOnMouseClicked(e -> {
 			if (rotate.getStatus() == Animation.Status.RUNNING) {
 				rotate.pause();
+
 			} else {
-				mouse.mouseMove(1920/2, 1080/2);
-				mouse.mouseMove(1920/2, 1080/2);
-				mouse.mouseMove(1920/2, 1080/2);
-				mouse.mouseMove(1920/2, 1080/2);
-				mouse.mouseMove(1920/2, 1080/2);
+				//I had to use the mouse move three times because there is an open bug in the JDK for Win 10.
+				//https://stackoverflow.com/questions/48799393/robot-mousemove-not-moving-to-specified-location-properly
+				mouse.mouseMove(((int) (window.getX() + (sizeXWindow/2) + 10)),(int) (window.getHeight()/2) + 10);
+				mouse.mouseMove(((int) (window.getX() + (sizeXWindow/2) + 10)),(int) (window.getHeight()/2) + 10);
+				mouse.mouseMove(((int) (window.getX() + (sizeXWindow/2) + 10)),(int) (window.getHeight()/2) + 10);
+				mouse.mouseMove(((int) (window.getX() + (sizeXWindow/2) + 10)),(int) (window.getHeight()/2) + 10);
 				rotate.play();
+				System.out.println("Y" + mazeImage.getRotationAxis().getX());
 			}
 			try {
 				clicking.askToDie();
-			}catch (NullPointerException ex) {
+			} catch (NullPointerException ex) {
 			}
 			clicking = new MouseClickTask();
 			thread = new Thread(clicking);
 			thread.start();
 			this.mazeImage.setOnMousePressed(event -> {
 				try {
+					//This was taken from stackoverflow
 					// AWT Robot and Color to trace pixel information
 					Robot robot = new java.awt.Robot();
 					Color color = robot.getPixelColor((int) event.getScreenX(), (int) event.getScreenY());
@@ -116,9 +121,10 @@ public class GameScreen extends Scene {
 					String pixelInfo = "X: " + xPos + " Y: " + yPos + " | " + "r: " + colorRed + " g: " + colorGreen
 							+ " b: " + colorBlue + " | " + hexColor;
 					System.out.println(pixelInfo);
-					
-					if(!hexColor.equalsIgnoreCase("#FFFFFF")) {
+
+					if (!hexColor.equalsIgnoreCase("#FFFFFF")) {
 						clicking.askToDie();
+						hexColor = "#FFFFFF";
 					}
 
 					// Pass it on to the MainApp
@@ -131,12 +137,12 @@ public class GameScreen extends Scene {
 				clicking.askToDie();
 			});
 		});
-		
-		//Creates a thread that checks the game state
-		//checking = new CheckingGameState();
-		//checkingThread = new Thread(checking);
-		//checkingThread.start();
-		
+
+		// Creates a thread that checks the game state
+		// checking = new CheckingGameState();
+		// checkingThread = new Thread(checking);
+		// checkingThread.start();
+
 		hBoxTop = new HBox(20);
 		hBoxTop.getChildren().addAll(nextLvlBtn, winArea);
 
@@ -146,43 +152,51 @@ public class GameScreen extends Scene {
 		root.setTop(hBoxTop);
 		root.setCenter(mazeImage);
 		root.setBottom(hBoxBtm);
-
+		
 		nextLvlBtn.setOnAction(e -> {
-			try {
-				clicking.askToDie();
-			}catch (NullPointerException ex) {
-			}
-			setDifficulty();
-			reCreateMazeImage();
+			recreateLvl();
 		});
 	}
 	public void setDifficulty() {
-		if(isBeginner) {
+		if (isBeginner) {
 			this.rotationSpeed = 10;// Lower is better
 			this.mazeSize = 5;
-		}else if(isIntermediate) {
+		} else if (isIntermediate) {
 			this.rotationSpeed = 10;// Lower is better
 			this.mazeSize = 11;
-		}else if(isBrainFuck) {
-			this.rotationSpeed = 10;// Lower is better
+		} else if (isBrainFuck) {
+			this.rotationSpeed = 20;// Lower is faster
 			this.mazeSize = 49;
 		}
 	}
+
 	public void setDefaultDifficulty() {
 		isBeginner = true;
 		isIntermediate = false;
 		isBrainFuck = false;
 	}
+
 	public void setIntermediateDifficulty() {
 		isBeginner = false;
 		isIntermediate = true;
 		isBrainFuck = false;
 	}
+
 	public void setBrainFuckDifficulty() {
 		isBeginner = false;
 		isIntermediate = false;
 		isBrainFuck = true;
 	}
+
+	public void recreateLvl() {
+		setDifficulty();
+		reCreateMazeImage();
+		try {
+			clicking.askToDie();
+		} catch (NullPointerException ex) {
+		}
+	}
+
 	public void reCreateMazeImage() {
 		root.getChildren().remove(mazeImage);
 		imagePane.getChildren().clear();
@@ -191,7 +205,7 @@ public class GameScreen extends Scene {
 		// Tile tile = new Tile(500, 500, 100, 100, true, true, true, true);
 		// root.getChildren().addAll(tile.walls);
 
-		//initializeBtns();
+		// initializeBtns();
 
 		maze = generateMaze(mazeSize, mazeSize);
 		mazeImage = genMazeImage(initMazeGraphics(maze));
@@ -239,14 +253,14 @@ public class GameScreen extends Scene {
 		nextLvlBtn = new Button("Next Level");
 		gameLostBtn = new Button("Lose Game");
 	}
-	
+
 	public void initializeAreas() {
 		winArea = new Rectangle(800, 30);
 		winArea.setFill(javafx.scene.paint.Color.GREEN);
-		winArea.setOnMouseClicked(event ->{
+		winArea.setOnMouseClicked(event -> {
 			clicking.askToDie();
 		});
-		
+
 	}
 
 	public Cell[][] generateMaze(int row, int col) {
@@ -401,45 +415,51 @@ public class GameScreen extends Scene {
 		}
 		return null;
 	}
+
 	class MouseClickTask implements Runnable {
 		private boolean die = false;
+
 		public void askToDie() {
 			die = true;
 		}
+
 		public void run() {
 			while (!die) {
 				mouse.mousePress(InputEvent.BUTTON1_MASK);
-			    mouse.mouseRelease(InputEvent.BUTTON1_MASK);
-				
-			    try {
+				mouse.mouseRelease(InputEvent.BUTTON1_MASK);
+
+				try {
 					Thread.sleep(5);
 				} catch (InterruptedException ie) {
 				}
-				if(die) {
-			    	break;
-			    }
+				if (die) {
+					break;
+				}
 			}
 		}
 	}
-	class CheckingGameState implements Runnable{
+
+	class CheckingGameState implements Runnable {
 		private boolean die = false;
+
 		public void askToDie() {
 			die = true;
 		}
+
 		public void run() {
 			while (!die) {
-				if(!hexColor.equalsIgnoreCase("#FFFFFF")) {
+				if (!hexColor.equalsIgnoreCase("#FFFFFF")) {
 					gameLostBtn.fire();
 					die = true;
 					break;
 				}
-			    try {
+				try {
 					Thread.sleep(5);
 				} catch (InterruptedException ie) {
 				}
-				if(die) {
-			    	break;
-			    }
+				if (die) {
+					break;
+				}
 			}
 		}
 	}

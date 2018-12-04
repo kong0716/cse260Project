@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class EndGameScreen extends Scene{
@@ -27,6 +28,7 @@ public class EndGameScreen extends Scene{
 		returnToHomeScreenBtn = new Button("Return to Home Screen");
 		newGameBtn = new Button("Start A New Game");
 		loseMsg = new Text("Sorry, You Lose!");
+		loseMsg.setFont(Font.font(100));
 		score = new Text("");
 	}
 

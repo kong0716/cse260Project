@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 
 public class DifficultyScreen extends Scene{
 	protected Button returnToHomeScreenBtn;
+	protected Button playBtn;
 	protected RadioButton beginnerBtn;
 	protected RadioButton intermediateBtn;
 	protected RadioButton brainFuckBtn;
@@ -24,13 +25,14 @@ public class DifficultyScreen extends Scene{
 		initializeBtns();
 		
 		VBox vBox = new VBox(10);
-		vBox.getChildren().addAll(beginnerBtn, intermediateBtn, brainFuckBtn, returnToHomeScreenBtn);
+		vBox.getChildren().addAll(beginnerBtn, intermediateBtn, brainFuckBtn, returnToHomeScreenBtn, playBtn);
 		pane.setTop(difficultyLabel);
 		pane.setCenter(vBox);
 		super.setRoot(pane);
 	}
 	public void initializeBtns() {
 		returnToHomeScreenBtn = new Button("Home Screen");
+		playBtn = new Button("Play the game");
 		beginnerBtn = new RadioButton("Beginner");
 		intermediateBtn = new RadioButton("Intermediate");
 		brainFuckBtn = new RadioButton("Good Luck");

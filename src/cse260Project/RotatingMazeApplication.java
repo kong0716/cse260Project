@@ -32,94 +32,107 @@ public class RotatingMazeApplication extends Application {
 		homeScreen.playBtn.setOnAction(e -> {
 			try {
 				checking.askToDie();
-			} catch(NullPointerException ex) {
+			} catch (NullPointerException ex) {
 			}
-			// Creates a thread that checks the game state
-			checking = new CheckingGameState();
-			checkingThread = new Thread(checking);
-			checkingThread.start();
-			gameScreen.nextLvlBtn.fire();
-			
+			gameScreen.setDifficulty();
+			gameScreen.recreateLvl();
 			window.setScene(gameScreen);
 		});
 		homeScreen.difficultyBtn.setOnAction(e -> window.setScene(difficultyScreen));
 		homeScreen.quitBtn.setOnAction(e -> {
 			try {
 				checking.askToDie();
-			} catch(NullPointerException ex) {
+			} catch (NullPointerException ex) {
 			}
 			window.close();
 		});
 
 		difficultyScreen.returnToHomeScreenBtn.setOnAction(e -> window.setScene(homeScreen));
+		difficultyScreen.playBtn.setOnAction(e -> {
+			if(difficultyScreen.beginnerBtn.isSelected()) {
+				gameScreen.setDefaultDifficulty();
+			}
+			if(difficultyScreen.intermediateBtn.isSelected()) {
+				gameScreen.setIntermediateDifficulty();
+			}
+			if(difficultyScreen.brainFuckBtn.isSelected()) {
+				gameScreen.setBrainFuckDifficulty();
+			}
+			gameScreen.recreateLvl();
+			window.setScene(gameScreen);
+		});
 		difficultyScreen.brainFuckBtn.setOnAction(e -> {
 			gameScreen.setBrainFuckDifficulty();
-			gameScreen.nextLvlBtn.fire();
+			gameScreen.recreateLvl();
 		});
 		difficultyScreen.intermediateBtn.setOnAction(e -> {
 			gameScreen.setIntermediateDifficulty();
-			gameScreen.nextLvlBtn.fire();
+			gameScreen.recreateLvl();
 		});
 		difficultyScreen.beginnerBtn.setOnAction(e -> {
 			gameScreen.setDefaultDifficulty();
-			gameScreen.nextLvlBtn.fire();
+			gameScreen.recreateLvl();
 		});
 
 		gameScreen.returnToHomeScreenBtn.setOnAction(e -> {
 			try {
 				checking.askToDie();
-			} catch(NullPointerException ex) {
+			} catch (NullPointerException ex) {
 			}
 			window.setScene(homeScreen);
 		});
 
-		endGameScreen.returnToHomeScreenBtn.setOnAction(e -> {
-			gameScreen.setDefaultDifficulty();
-			gameScreen.nextLvlBtn.fire();
-			window.setScene(homeScreen);
-		});
-		endGameScreen.newGameBtn.setOnAction(e -> {
-			gameScreen.setDefaultDifficulty();
-			gameScreen.nextLvlBtn.fire();
-			window.setScene(gameScreen);
+		gameScreen.rotateBtn.setOnAction(e -> {
 			// Creates a thread that checks the game state
 			checking = new CheckingGameState();
 			checkingThread = new Thread(checking);
 			checkingThread.start();
 		});
+		
+		gameScreen.nextLvlBtn.setOnAction(e -> {
+			try {
+				checking.askToDie();
+			} catch (NullPointerException ex) {
+			}
+		});
+		
+		gameScreen.mazeImage.setOnMouseExited(e -> {
+			try {
+				checking.askToDie();
+			} catch (NullPointerException ex) {
+			}
+			
+		});
+
+		endGameScreen.returnToHomeScreenBtn.setOnAction(e -> {
+			//gameScreen.setDefaultDifficulty();
+			gameScreen.nextLvlBtn.fire();
+			window.setScene(homeScreen);
+		});
+		endGameScreen.newGameBtn.setOnAction(e -> {
+			gameScreen.setDifficulty();
+			gameScreen.recreateLvl();
+			window.setScene(gameScreen);
+		});
+
 		/**
-		new Thread(new Runnable() {
-			private boolean die = false;
-
-			public void askToDie() {
-				die = true;
-			}
-
-			@Override
-			public void run() {
-				try {
-					while (!die) {
-						if (!gameScreen.hexColor.equalsIgnoreCase("#FFFFFF")) {
-							Platform.runLater(new Runnable() {
-								@Override
-								public void run() {
-									window.setScene(endGameScreen);
-								}
-							});
-							Thread.sleep(20);
-							this.askToDie();
-						}
-						System.out.println("Check is running");
-					}
-				} catch (InterruptedException ex) {
-					System.out.println("Error");
-				}
-			}
-		}).start();
-		**/
+		 * new Thread(new Runnable() { private boolean die = false;
+		 * 
+		 * public void askToDie() { die = true; }
+		 * 
+		 * @Override public void run() { try { while (!die) { if
+		 *           (!gameScreen.hexColor.equalsIgnoreCase("#FFFFFF")) {
+		 *           Platform.runLater(new Runnable() {
+		 * @Override public void run() { window.setScene(endGameScreen); } });
+		 *           Thread.sleep(20); this.askToDie(); } System.out.println("Check is
+		 *           running"); } } catch (InterruptedException ex) {
+		 *           System.out.println("Error"); } } }).start();
+		 **/
 
 		window.setScene(homeScreen);
 		window.show();
+		System.out.println("Screen origin is (" + window.getX() + ", " + window.getY() + ")");
+		gameScreen.window = window;
 	}
 
 	class CheckingGameState implements Runnable {
@@ -140,9 +153,9 @@ public class RotatingMazeApplication extends Application {
 								window.setScene(endGameScreen);
 							}
 						});
-						Thread.sleep(20);
+						Thread.sleep(5);
 						this.askToDie();
-						gameScreen.hexColor = "#FFFFFF";
+						gameScreen.hexColor.equalsIgnoreCase("#FFFFFF");
 					}
 					System.out.println("Check is running");
 				}
