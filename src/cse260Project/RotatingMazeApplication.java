@@ -2,7 +2,6 @@ package cse260Project;
 
 import java.awt.event.InputEvent;
 
-import cse260Project.GameScreen.CheckingGameState;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -81,14 +80,12 @@ public class RotatingMazeApplication extends Application {
 			}
 			window.setScene(homeScreen);
 		});
-
 		gameScreen.rotateBtn.setOnAction(e -> {
 			// Creates a thread that checks the game state
 			checking = new CheckingGameState();
 			checkingThread = new Thread(checking);
 			checkingThread.start();
 		});
-		
 		gameScreen.nextLvlBtn.setOnAction(e -> {
 			try {
 				checking.askToDie();

@@ -95,6 +95,7 @@ public class GameScreen extends Scene {
 				rotate.play();
 				System.out.println("Y" + mazeImage.getRotationAxis().getX());
 			}
+			//We want to kill any threads that haven't died. DON'T DELETE THIS AT ALL. IT WILL FUCK YOU UP.
 			try {
 				clicking.askToDie();
 			} catch (NullPointerException ex) {
@@ -102,7 +103,7 @@ public class GameScreen extends Scene {
 			clicking = new MouseClickTask();
 			thread = new Thread(clicking);
 			thread.start();
-			this.mazeImage.setOnMousePressed(event -> {
+			this.mazeImage.setOnMouseClicked(event -> {
 				try {
 					//This was taken from stackoverflow
 					// AWT Robot and Color to trace pixel information
@@ -422,37 +423,11 @@ public class GameScreen extends Scene {
 		public void askToDie() {
 			die = true;
 		}
-
 		public void run() {
 			while (!die) {
 				mouse.mousePress(InputEvent.BUTTON1_MASK);
 				mouse.mouseRelease(InputEvent.BUTTON1_MASK);
-
-				try {
-					Thread.sleep(5);
-				} catch (InterruptedException ie) {
-				}
-				if (die) {
-					break;
-				}
-			}
-		}
-	}
-
-	class CheckingGameState implements Runnable {
-		private boolean die = false;
-
-		public void askToDie() {
-			die = true;
-		}
-
-		public void run() {
-			while (!die) {
-				if (!hexColor.equalsIgnoreCase("#FFFFFF")) {
-					gameLostBtn.fire();
-					die = true;
-					break;
-				}
+				System.out.println("Clicking");
 				try {
 					Thread.sleep(5);
 				} catch (InterruptedException ie) {
