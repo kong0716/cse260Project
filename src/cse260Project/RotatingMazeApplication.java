@@ -148,11 +148,13 @@ public class RotatingMazeApplication extends Application {
 							@Override
 							public void run() {
 								window.setScene(endGameScreen);
+								System.out.println(gameScreen.hexColor);
 							}
 						});
 						Thread.sleep(5);
 						this.askToDie();
 						gameScreen.hexColor.equalsIgnoreCase("#FFFFFF");
+						System.out.println(gameScreen.hexColor);
 					}
 					System.out.println("Check is running");
 				}

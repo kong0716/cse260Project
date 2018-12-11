@@ -116,7 +116,7 @@ public class GameScreen extends Scene {
 					String colorRed = Integer.toString((int) color.getRed());
 					String colorBlue = Integer.toString((int) color.getBlue());
 					String colorGreen = Integer.toString((int) color.getGreen());
-					hexColor = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+					this.hexColor = String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
 
 					// Unify and format the information
 					String pixelInfo = "X: " + xPos + " Y: " + yPos + " | " + "r: " + colorRed + " g: " + colorGreen
@@ -125,7 +125,7 @@ public class GameScreen extends Scene {
 
 					if (!hexColor.equalsIgnoreCase("#FFFFFF")) {
 						clicking.askToDie();
-						hexColor = "#FFFFFF"; //Resets the hexColor
+						this.hexColor = "#FFFFFF"; //Resets the hexColor
 					}
 
 					// Pass it on to the MainApp
